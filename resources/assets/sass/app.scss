@@ -29,13 +29,25 @@ $width : 1em;
    @return #{$xoffset} #{$yoffset} rgba(0, 0, 0, $color)
 }
 
+@function lowestSquareRoot($units){
+  $primes : 2 3 5 7 11;
+
+  @each $prime in $primes{
+    $primeSquare: $prime * $prime;
+    @if($units % $primeSquare == 0){
+      @return $prime;
+    }
+  }
+}
 @mixin clones($height,$width, $units){
   height: $height;
   width : $width;
+  $prime : lowestSquareRoot($units);
+  $row : $units / $prime;
   //something
   background: red;
   $newUnits: $units - 1;
-  $whole :;
+  $whole :'';
 
     @for $i from 1 through $newUnits {
       $color: $i / $newUnits;
