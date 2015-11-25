@@ -19,3 +19,8 @@ Route::delete('/board', 'BoggleController@clear');
 
 
 Route::post('/words', 'BoggleController@saveWord');
+
+
+Route::get('/spiral', function(){
+    return view('spiral');
+});

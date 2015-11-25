@@ -1,2 +1,52 @@
 // @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 
+// sizes
+$height : 1em;
+$width : 1em;
+
+//check if squareroot
+
+
+// get the numbers square root
+@function sqrt($r) {
+  $x0: 1;
+  $x1: $x0;
+
+  @for $i from 1 through 10 {
+    $x1: $x0 - ($x0 * $x0 - abs($r)) / (2 * $x0);
+    $x0: $x1;
+  }
+
+  @return $x1;
+}
+
+//check to get the lowest common denominator
+@function divisable(){
+  //#{sqrt(81)}px
+}
+
+@function boxShadows($xoffset, $yoffset, $color){
+   @return #{$xoffset} #{$yoffset} rgba(0, 0, 0, $color)
+}
+
+@mixin clones($height,$width, $units){
+  height: $height;
+  width : $width;
+  //something
+  background: red;
+  $newUnits: $units - 1;
+  $whole :;
+
+    @for $i from 1 through $newUnits {
+      $color: $i / $newUnits;
+      $xOffset: $i * $width;
+      $yOffset: $i * $height;
+      $shadow: boxShadows($xOffset, $yOffset, $color);
+      $whole : append($whole, $shadow, "comma");
+    }
+  box-shadow: $whole;
+}
+
+#alpha {
+  @include clones(1em, 1em, 32);
+}
