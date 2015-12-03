@@ -58,21 +58,26 @@
     </style>
 </head>
 <body>
-    <div id="app" class="container">
-        <input v-model="token" type="hidden" name="_token" value="{{ csrf_token() }}">
+<div id="app" class="container">
+    <input v-model="token" type="hidden" name="_token" value="{{ csrf_token() }}">
 
-        <h1>@{{ word }}</h1>
-        <button @click="saveWord">Save Word</button>
-        <button @click="clearWord">Clear Word</button>
-        <button @click="getNewTable">New Tables</button>
-        <ul class="container" v-bind:class="{'play': play }">
-            <li
-                @click="selectSquare(square.id, square.active, square.used)"
-                v-bind:class="{'used':  square.used , 'active' : square.active }" id="square-@{{ square.id }}" v-for="square in board">
-                <p>@{{ square.letter }}</p>
-            </li>
-        </ul>
+    <h1>@{{ word }}</h1>
+    <button @click="saveWord">Save Word</button>
+    <button @click="clearWord">Clear Word</button>
+    <button @click="getNewTable">New Tables</button>
+    <ul class="container" v-bind:class="{'play': play }">
+        <li
+        @click="selectSquare(square.id, square.active, square.used)"
+        v-bind:class="{'used':  square.used , 'active' : square.active }" id="square-@{{ square.id }}" v-for="square in board">
+        <p>@{{ square.letter }}</p>
+        </li>
+    </ul>
+    <div class="words">
+        {{--@foreach($words as $word)--}}
+            {{--{{ $word }}--}}
+        {{--@endforeach--}}
     </div>
+</div>
 
 
 </body>

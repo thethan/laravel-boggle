@@ -13,6 +13,8 @@
 
 Route::get('/', 'BoggleController@index');
 
+Route::get('/solver', 'BoggleController@solver');
+
 Route::get('/board', 'BoggleController@listSquares');
 
 Route::delete('/board', 'BoggleController@clear');

@@ -3,7 +3,7 @@
 namespace App;
 
 
-class Square extends BoggleBoard
+class Square
 {
     /**
      * @var integer
@@ -24,6 +24,9 @@ class Square extends BoggleBoard
      * @var
      */
     protected $prev, $next, $topLeft, $topRight, $bottomLeft, $bottomRight, $top, $bottom;
+    protected $boardWidth = 4;
+    protected $boardHeight = 4;
+    protected $size = 16;
 
     /**
      * @var
@@ -34,10 +37,12 @@ class Square extends BoggleBoard
      * Square constructor.
      * @param $id
      */
-    public function __construct($id)
+    public function __construct($id, $width, $height)
     {
         $this->id = $id;
         $this->row = $this->row();
+
+
 
         $this->next = $id +1;
         $this->prev = $id -1;

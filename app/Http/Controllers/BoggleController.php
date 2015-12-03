@@ -6,6 +6,7 @@ use App\BoggleBoard;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\Word;
 use Illuminate\Support\Facades\Session;
 
 class BoggleController extends Controller
@@ -29,6 +30,14 @@ class BoggleController extends Controller
         return view('welcome', compact('boggleBoard'));
     }
 
+    public function solver()
+    {
+        $boggleBoard = new BoggleBoard();
+        $boggleBoard->solve();
+        return view('solver', compact('boggleBoard'))->with('words', $boggleBoard->getWords());
+    }
+
+
     public function saveWord(Requests\WordRequest $request)
     {
 
@@ -38,10 +47,13 @@ class BoggleController extends Controller
             $words = [];
         }
 
+
         $obj = json_decode($request->getContent('Word'));
 
+        if(Word::checkWord($obj->Word)){
+            $request->session()->push('words', $obj->Word);
 
-        $request->session()->push('words', $obj->Word);
+        }
 
         return $request->session()->get('words');
     }
