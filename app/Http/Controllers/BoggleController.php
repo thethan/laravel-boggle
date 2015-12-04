@@ -26,15 +26,15 @@ class BoggleController extends Controller
     public function index()
     {
 
-        $boggleBoard = new BoggleBoard();
-        return view('welcome', compact('boggleBoard'));
+        return view('welcome');
     }
 
     public function solver()
     {
         $boggleBoard = new BoggleBoard();
         $boggleBoard->solve();
-        return view('solver', compact('boggleBoard'))->with('words', $boggleBoard->getWords());
+        return $boggleBoard->words;
+//        return view('solver', compact('boggleBoard'));
     }
 
 

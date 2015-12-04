@@ -30,7 +30,7 @@ abstract class Wiktionary implements DictionaryInterface
     protected static function checkPage($output)
     {
         // -1 is the Page of the pages if not exist
-        if(property_exists($output->query->pages, '-1')) {
+        if( property_exists($output->query->pages, '-1')) {
             return false;
         } else {
             return true;

@@ -233,4 +233,11 @@ class Square
             return $bottomRight;
         }
     }
+
+    protected function adjacent()
+    {
+        return $this->adjacent();
+    }
+
+
 }

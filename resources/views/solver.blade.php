@@ -66,13 +66,16 @@
     <button @click="clearWord">Clear Word</button>
     <button @click="getNewTable">New Tables</button>
     <ul class="container" v-bind:class="{'play': play }">
-        <li
-        @click="selectSquare(square.id, square.active, square.used)"
-        v-bind:class="{'used':  square.used , 'active' : square.active }" id="square-@{{ square.id }}" v-for="square in board">
-        <p>@{{ square.letter }}</p>
-        </li>
+        {{--<li--}}
+        {{--@click="selectSquare(square.id, square.active, square.used)"--}}
+        {{--v-bind:class="{'used':  square.used , 'active' : square.active }" id="square-@{{ square.id }}" v-for="square in board">--}}
+        {{--<p>@{{ square.letter }}</p>--}}
+        {{--</li>--}}
     </ul>
     <div class="words">
+        <?php print_r($boggleBoard->squares);
+            var_dump($boggleBoard->words);
+        ?>
         {{--@foreach($words as $word)--}}
             {{--{{ $word }}--}}
         {{--@endforeach--}}
