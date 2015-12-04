@@ -133,23 +133,25 @@ class BoggleBoard
                         $this->clearInUse($placement);
                         $this->clearWord($placement);
 
-                        $this->inUse[$placement] = $adjacent;
                         $square_two = $this->getSquare($adjacent);
+                        var_dump('letter', $square_two);
+                        $this->inUse[$placement] = $square_two->id;
+
                         $this->word[$placement] = $square_two->letter;
 
 
                         for ($two = 0; $two < count($square_two->adjacent); $two++) {
                             $placement = 3;
-                            $adjacent = $square_two->adjacent[$two];
+                            $adjacent_two = $square_two->adjacent[$two];
 
+                            $square_three = $this->getSquare($adjacent_two);
                             var_dump('adjacent', $square_two);
-                            if (!in_array($adjacent, $this->inUse) && in_array($adjacent, $square_two->adjacent)) {
+                            if (!in_array($adjacent_two, $this->inUse) && in_array($adjacent_two, $square_two->adjacent)) {
 
                                 $this->clearInUse($placement);
                                 $this->clearWord($placement);
-                                $this->inUse[$placement] = $adjacent;
 
-                                $square_three = $this->getSquare($adjacent);
+                                $this->inUse[$placement] = $square_three->id;
                                 $this->word[$placement] = $square_three->letter;
 
 
