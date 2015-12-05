@@ -8,20 +8,13 @@ class BoggleBoard
 {
 
 
-    protected $size = 16;
-
-    protected $boardHeight = 4;
-
-    protected $boardWidth = 4;
-
-    protected $squares = array();
-
-    protected $checked = array();
-
     public $words = array();
-
     public $lettersLong = 3;
-
+    protected $size = 16;
+    protected $boardHeight = 4;
+    protected $boardWidth = 4;
+    protected $squares = array();
+    protected $checked = array();
     protected $inUse, $word, $allUses, $wordPool, $wordArray;
 
     /**
@@ -31,6 +24,7 @@ class BoggleBoard
      */
     public function __construct($size = 16)
     {
+        ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 
         $squares = [];
 
@@ -54,21 +48,6 @@ class BoggleBoard
         return $this->words;
     }
 
-
-    public function clearInUse($placement = 1)
-    {
-        for ($i = $placement; $i <= $this->size; $i++) {
-            unset($this->inUse[$i]);
-        }
-    }
-
-    public function clearWord($placement = 1)
-    {
-        for ($i = $placement; $i <= $this->size; $i++) {
-            unset($this->word[$i]);
-        }
-    }
-
     /**
      * Loop through the available patterns and determins if in use
      */
@@ -81,117 +60,117 @@ class BoggleBoard
         $this->inUse = [];
 
         foreach ($this->squares as $square) {
+
             $this->clearInUse(1);
-            $this->clearWord(1);
             $this->inUse[1] = $square->id;
             $this->word[1] = $square->letter;
-            print "$square->id \n";
+            $this->addToInUse($square->id, 1);
 
-            if ($square->id < 11) {
+            // add the second
+            foreach ($square->adjacent as $adj) {
+                $this->clearInUse(2);
+                $key = $this->lastUsedKey() + 1;
+                $value = $this->lastUsedValue();
+                $this->addToInUse($adj, $key);
 
-                for ($i = 0; $i < count($square->adjacent); $i++) {
-                    $adjacent = $square->adjacent[$i];
-                    if (!in_array($adjacent, $this->inUse)) {
-                        $this->clearInUse(2);
-                        $this->clearWord(2);
-
-                        $square_two = $this->getSquare($adjacent);
-
-                        $this->inUse[2] = $square_two->id;
-                        $this->word[2] = $square_two->letter;
-
-//                        var_dump($square_two->adjacent);
-
-//                        for($ii = 3; $ii <= $this->size; $ii++){
-//                            $place = 3;
-//                            $return = $this->loopThroughAdjacent($square_two->adjacent, $place);
-//
-//                        }
-
-                        foreach ($square_two->adjacent as $id3) {
-                            if (!in_array($id3, $this->inUse)) {
-                                $square_three = $this->getSquare($id3);
-                                $this->clearInUse(3);
-                                $this->clearWord(3);
-
-                                $this->inUse[3] = $square_three->id;
-                                $this->word[3] = $square_three->letter;
-
-
-                                $word = implode('', $this->word);
-                                $this->checkWord($word);
-
-                                foreach ($square_three->adjacent as $id4) {
-                                    if (!in_array($id4, $this->inUse)) {
-                                        $square_four = $this->getSquare($id4);
-                                        $this->clearInUse(4);
-                                        $this->clearWord(4);
-
-                                        $this->inUse[4] = $square_four->id;
-                                        $this->word[4] = $square_four->letter;
-
-                                        $word = implode('', $this->word);
-                                        $this->checkWord($word);
-
-                                        foreach ($square_four->adjacent as $id5) {
-                                            if (!in_array($id5, $this->inUse)) {
-                                                $square_five = $this->getSquare($id5);
-                                                $this->clearInUse(5);
-                                                $this->clearWord(5);
-
-                                                $this->inUse[5] = $square_five->id;
-                                                $this->word[5] = $square_five->letter;
-
-                                                $word = implode('', $this->word);
-                                                $this->checkWord($word);
-                                                var_dump($this->inUse);
-                                            }
-                                        }
-                                    }
-                                }
-
-                            }
-                        }
-                    }
+            }
+            $i = 0;
+            //get the icons after for the first and second key
+            while ($i < 14) {
+                if ($i === 7) {
+                    print "$i \n\n\n";
                 }
+                $allUses = $this->allUses[$square->id];
+                foreach ($allUses as $use) {
+
+                    $this->inUse = $use;
+                    $value = $this->lastUsedValue($use);
+                    $key = $this->lastUsedKey($use) + 1;
+
+                    $sq = $this->getSquare($value);
+                    $sq_adjacents = $this->adjacentSquare($sq->adjacent, $key);
+
+                    $sq_adjacents2 = $this->adjacentSquare($sq_adjacents, $key++);
+
+                    $sq_adjacents3 = $this->adjacentSquare($sq_adjacents2, $key++);
+
+                    $sq_adjacents4 = $this->adjacentSquare($sq_adjacents3, $key++);
+
+                    $sq_adjacents5 = $this->adjacentSquare($sq_adjacents4, $key++);
+
+                    var_dump($this->inUse);
+
+                    $sq_adjacents6 = $this->adjacentSquare($sq_adjacents5, $key++);
+                }
+
+
+                $i++;
             }
+
         }
-        var_dump($this->words);
-        exit;
+//        var_dump($this->allUses);
+    }
+
+    public function clearInUse($placement = 1)
+    {
+        for ($i = $placement; $i <= $this->size; $i++) {
+            unset($this->inUse[$i]);
+        }
+    }
+
+    public function addToInUse($id, $place)
+    {
+        if (!in_array($id, $this->inUse)) {
+
+            $this->clearInUse($place);
+
+            $square = $this->getSquare($id);
+            $this->inUse[$place] = $square->id;
+
+
+            $this->allUses[array_values($this->inUse)[0]][] = $this->inUse;
+
+            $used = array_values($this->inUse);
+            $result = array_diff($square->adjacent, $this->inUse);
+            if ($place > 2) {
+                foreach ($this->inUse as $key => $id) {
+                    $this->word[$key] = $this->getLetter($id);
+                }
+                $word = implode('', $this->word);
+                $this->checkWord($word);
+
+            }
+
+
+            return $result;
+
+        }
 
     }
 
-
-    public function loopThroughAdjacent($adjacentArray, $place)
+    /**
+     * Pass in the Id and it will return the square based on the index.
+     * @param $id
+     * @return mixed
+     */
+    public function getSquare($id)
     {
-        foreach ($adjacentArray  as $id){
-            if(!in_array($id, $this->inUse)){
-//                $this->clearInUse($place);
-//                $this->clearWord($place);
+        $index = $id - 1;
 
-                $square = $this->getSquare($id);
-                $this->inUse[$place] = $square->id;
-                $this->word[$place] = $square->letter;
-
-                $used = array_values($this->inUse);
-
-                $result = array_diff($used, $square->adjacent);
-
-                var_dump($result);
-                return $result;
-            }
-        }
+        return $this->squares[$index];
     }
 
-    public function squareAdjacent()
+    public function getLetter($id)
     {
-        foreach ($this->squares as $square) {
-            return $square;
-        }
+        $sq = $this->getSquare($id);
+        return $sq->letter;
     }
 
     /**
      * Checks to the dictionary to see if word exists.
+     * The money maker if you will
+     *
+     * Using Wikipedia because it had a quasi api
      */
     protected function checkWord($word)
     {
@@ -203,15 +182,61 @@ class BoggleBoard
         $this->checked[] = $word;
     }
 
-    /**
-     * Pass in the Id and it will return the square based on the index.
-     * @param $id
-     * @return mixed
-     */
-    public function getSquare($id)
+    public function lastUsedKey($inUse = null)
     {
-        $index = $id - 1;
-        return $this->squares[$index];
+        if (empty($inUse)) {
+            $inUse = $this->inUse;
+        }
+        end($inUse);
+
+        return key($inUse);
+    }
+
+    public function lastUsedValue($inUse = null)
+    {
+        if (empty($inUse)) {
+            $inUse = $this->inUse;
+        }
+        return end($inUse);;
+    }
+
+    public function adjacentSquare($adjacents, $position)
+    {
+
+        if (is_array($adjacents)) {
+            foreach ($adjacents as $id) {
+
+                $square = $this->getSquare($id);
+
+                return $this->loopThroughAdjacent($square->adjacent, $position);
+            }
+        }
+    }
+
+    public function loopThroughAdjacent($adjacentArray, $place)
+    {
+        foreach ($adjacentArray as $id) {
+            return $this->addToInUse($id, $place);
+        }
+    }
+
+    public function getFromAllUse($id)
+    {
+        return $this->allUses[$id];
+    }
+
+    public function clearWord($placement = 1)
+    {
+        for ($i = $placement; $i <= $this->size; $i++) {
+            unset($this->word[$i]);
+        }
+    }
+
+    public function squareAdjacent()
+    {
+        foreach ($this->squares as $square) {
+            return $square;
+        }
     }
 
 

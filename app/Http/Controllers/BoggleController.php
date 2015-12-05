@@ -34,7 +34,7 @@ class BoggleController extends Controller
         $boggleBoard = new BoggleBoard();
         $boggleBoard->solve();
         return $boggleBoard->words;
-//        return view('solver', compact('boggleBoard'));
+        return view('solver', compact('boggleBoard'));
     }
 
 
