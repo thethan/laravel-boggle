@@ -5,22 +5,33 @@ namespace App;
 use App\Dictionary\TextDictionary;
 use App\Dictionary\Wiktionary;
 
-abstract class Word
+class Word
 {
 
+    public $dictionary;
     /**
-     * @param $word
-     * @return mixed
+     * Word constructor.
+     *
+     * Did this to save memory by not initializing its own class everytime.
      */
-    public static function checkWord($word)
+    public function __construct()
     {
-        return TextDictionary::checkWord($word);
-//        return Wiktionary::checkWord($word);
+        $file = file_get_contents(base_path() . '/resources/dictionary.txt', "r");
+
+        $this->dictionary = explode("\n", $file);
 
     }
 
-    private function checkPages()
+    /**
+     * @param $word
+     * @return string|false
+     */
+    public function checkWord($word)
     {
+        if(in_array($word, $this->dictionary)){
+            return $word;
+        }
+        return false;
 
     }
 }

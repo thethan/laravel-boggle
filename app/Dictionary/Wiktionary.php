@@ -27,7 +27,7 @@ abstract class Wiktionary implements DictionaryInterface
         return $output;
     }
 
-    protected static function checkPage($output)
+    protected static function checkPage($output = null)
     {
         // -1 is the Page of the pages if not exist
         if( property_exists($output->query->pages, '-1')) {

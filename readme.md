@@ -32,6 +32,5 @@ Performance is impacted by the balance between front end and back end. You could
 
 ## Forward Thinking
 
-Find a backend and front end solution.
-
-Become more proficient with vuejs to make the script more efficient
+This is not the most efficient way. Looking at it from the game itself to begin with and then fitting a solver into it was a bad idea but i was determined to do it.
+Next time i would just make a work based application

@@ -4,21 +4,51 @@
 namespace App;
 
 
+use App\Dictionary\TextDictionary;
+
 class BoggleBoard
 {
 
-
+    /**
+     * @var array
+     */
     public $words = array();
+    /**
+     * @var int
+     */
     public $lettersLong = 3;
+    /**
+     * @var int
+     */
     protected $size = 16;
+    /**
+     * @var int
+     */
     protected $boardHeight = 4;
+    /**
+     * @var int
+     */
     protected $boardWidth = 4;
+    /**
+     * @var array
+     */
     protected $squares = array();
+    /**
+     * @var array
+     */
     protected $checked = array();
+    /**
+     * @var
+     */
     protected $inUse, $word, $allUses, $wordPool, $wordArray;
-    protected $letters;
-
-    protected $validate;
+    /**
+     * @var array
+     */
+    protected $letters = [];
+    /**
+     * @var array
+     */
+    protected $dictionary;
 
     /**
      * Generate a board
@@ -28,6 +58,7 @@ class BoggleBoard
     public function __construct($size = 16)
     {
         ini_set('max_execution_time', 600); //300 seconds = 5 minutes
+        ini_set('memory_limit','256M');
 
         $squares = [];
 
@@ -37,7 +68,7 @@ class BoggleBoard
 
         $this->squares = $squares;
 
-        $this->validate = [];
+        $this->dictionary = new Word();
 
 
     }
@@ -67,7 +98,6 @@ class BoggleBoard
 
         foreach ($this->squares as $square) {
 
-
             $this->clearInUse(1);
             $this->inUse[1] = $square->id;
             $this->allUses[$square->id] = [];
@@ -77,8 +107,7 @@ class BoggleBoard
 
             $i = 1;
             //get the icons after for the first and second key
-            while ($i < 8) {
-
+            while ($i < 6) {
 
                 $this->getLastAndAdd($square->id);
 
@@ -86,6 +115,7 @@ class BoggleBoard
 
             }
         }
+        exit;
     }
 
     public function getLastAndAdd($id)
@@ -134,10 +164,6 @@ class BoggleBoard
             $this->checkWord($word);
 
         }
-//        $used = array_values($this->inUse);
-//        $result = array_diff($square->adjacent, $this->inUse);
-//
-//        return $result;
 
 
     }
@@ -165,6 +191,11 @@ class BoggleBoard
         return $this->squares[$index];
     }
 
+    /**
+     * Return the letter of the square
+     * @param $id
+     * @return string
+     */
     public function getLetter($id)
     {
         $sq = $this->getSquare($id);
@@ -179,14 +210,19 @@ class BoggleBoard
      */
     protected function checkWord($word)
     {
+
         if (strlen($word) >= 3 && !in_array($word, $this->checked)) {
-            if (!empty(Word::checkWord($word))) {
+            if (!empty($this->dictionary->checkWord($word))) {
                 $this->words[] = $word;
             }
             $this->checked[] = $word;
         }
     }
 
+    /**
+     * @param null $inUse
+     * @return mixed
+     */
     public function lastUsedKey($inUse = null)
     {
         if (empty($inUse)) {
@@ -197,6 +233,10 @@ class BoggleBoard
         return key($inUse);
     }
 
+    /**
+     * @param null $inUse
+     * @return mixed
+     */
     public function lastUsedValue($inUse = null)
     {
         if (empty($inUse)) {
@@ -205,6 +245,10 @@ class BoggleBoard
         return end($inUse);
     }
 
+    /**
+     * @param $adjacents
+     * @param $position
+     */
     public function adjacentSquare($adjacents, $position)
     {
 

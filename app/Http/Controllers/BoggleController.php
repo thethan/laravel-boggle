@@ -12,28 +12,51 @@ use Illuminate\Support\Facades\Session;
 class BoggleController extends Controller
 {
     /**
+     * Variable for the boggle board
+     *
+     * @var BoggleBoard
+     */
+    public $boggleBoard;
+
+    public function __construct()
+    {
+        $this->boggleBoard = new BoggleBoard();
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function listSquares()
     {
-        $board  = new BoggleBoard();
+        $board['board'] = $this->boggleBoard->getBoard();
+        $this->boggleBoard->solve();
+        $board['words'] = $this->boggleBoard->words;
 
-        return response()->json($board->getBoard()  );
+
+        return response()->json( $board );
     }
 
+    /**
+     * Return the main board view
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function index()
     {
 
         return view('welcome');
     }
 
+    /**
+     * Return the solver view
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function solver()
     {
-        $boggleBoard = new BoggleBoard();
-        $boggleBoard->solve();
-        return $boggleBoard->words;
+        $this->boggleBoard->solve();
         return view('solver', compact('boggleBoard'));
     }
 
@@ -50,7 +73,7 @@ class BoggleController extends Controller
 
         $obj = json_decode($request->getContent('Word'));
 
-        if(Word::checkWord($obj->Word)){
+        if($this->boggleBoard->checkWord($obj->Word)){
             $request->session()->push('words', $obj->Word);
 
         }

@@ -8,6 +8,7 @@ var boggle = new Vue({
         play: false,
         currentSquare: 0,
         board: null,
+        words: [],
         word: null,
         used: [],
         token: null
@@ -27,7 +28,9 @@ var boggle = new Vue({
             var self = this
             xhr.open('GET', apiURL)
             xhr.onload = function () {
-                self.board = JSON.parse(xhr.responseText)
+                var data = JSON.parse(xhr.responseText)
+                self.board = data.board;
+                self.words = data.words;
             }
             xhr.send()
         },

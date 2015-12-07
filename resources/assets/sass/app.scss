@@ -1,64 +1,119 @@
 // @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
 
 // sizes
-$height : 1em;
-$width : 1em;
+$height: 1em;
+$width: 1em;
 
 //check if squareroot
 
 
-// get the numbers square root
-@function sqrt($r) {
-  $x0: 1;
-  $x1: $x0;
+@function power ($x, $n) {
+  $ret: 1;
 
-  @for $i from 1 through 10 {
-    $x1: $x0 - ($x0 * $x0 - abs($r)) / (2 * $x0);
-    $x0: $x1;
+  @if $n >= 0 {
+    @for $i from 1 through $n {
+      $ret: $ret * $x;
+    }
+  } @else {
+    @for $i from $n to 0 {
+      $ret: $ret / $x;
+    }
   }
 
-  @return $x1;
+  @return $ret;
 }
 
-//check to get the lowest common denominator
-@function divisable(){
-  //#{sqrt(81)}px
+@function boxShadows($xoffset, $yoffset, $color) {
+  @return #{$xoffset} #{$yoffset} rgba(0, 0, 0, $color)
 }
 
-@function boxShadows($xoffset, $yoffset, $color){
-   @return #{$xoffset} #{$yoffset} rgba(0, 0, 0, $color)
-}
+@function lowestSquareRoot($units) {
+  $primes: 2 3 5 7 11;
 
-@function lowestSquareRoot($units){
-  $primes : 2 3 5 7 11;
-
-  @each $prime in $primes{
+  @each $prime in $primes {
     $primeSquare: $prime * $prime;
-    @if($units % $primeSquare == 0){
+    @if ($units % $primeSquare == 0) {
+      @if (($units / $primeSquare != 0)) {
+        @return $primeSquare;
+      }
       @return $prime;
     }
   }
 }
-@mixin clones($height,$width, $units){
+
+@mixin clones($height,$width, $units) {
   height: $height;
-  width : $width;
-  $prime : lowestSquareRoot($units);
-  $row : $units / $prime;
+  width: $width;
+  $prime: lowestSquareRoot($units);
+  $row: $units / $prime;
+  $column: $units / $row;
   //something
   background: red;
   $newUnits: $units - 1;
-  $whole :'';
+  $shadow: boxShadows(0em, 0em, 1);
+  $whole: #{$shadow};
 
-    @for $i from 1 through $newUnits {
-      $color: $i / $newUnits;
-      $xOffset: $i * $width;
-      $yOffset: $i * $height;
-      $shadow: boxShadows($xOffset, $yOffset, $color);
-      $whole : append($whole, $shadow, "comma");
+  $lastY: 0;
+  $lastX: 0;
+
+  @for $i from 1 through $units {
+    $color: $i / $units;
+    $x: $i - 1;
+    $y: 0;
+
+    $yCord: $i / $column;
+
+    @if (($color) <= .25) {
+      $y: $lastY;
+
+    } @else if (
+              ( $color > 0.25) and
+              ( $color <= 0.34375 )
+    ) {
+      $x: $lastX;
+      $y: $lastY + 1;
+    } @else if (
+            ( $color > 0.34375) and
+            ( $color <= 0.5625)
+    ){
+      $x: $lastX - 1;
+      $y: $lastY;
+    } @else if (
+      ( $color > 0.5625) and
+        ( $color <= 0.625)
+    ){
+      $x: $lastX;
+      $y: $lastY - 1;
+    } @else if (
+      ($color > 0.625) and ($color <= 0.8125 )
+    ){
+      $x: $lastX + 1;
+      $y: $lastY;
     }
+    @else if (
+            ($color > 0.8125) and ($color <= 0.84375)
+    ){
+      $x: $lastX;
+      $y: $lastY + 1;
+    } @else {
+      $x: $lastX - 1;
+      $y: $lastY;
+    }
+
+    $xOffset: #{$x * $width};
+    $yOffset: #{$y * $height};
+
+    $lastY: $y;
+    $lastX: $x;
+
+    $shadow: boxShadows($xOffset, $yOffset, $color);
+    $whole: append($whole, $shadow, "comma");
+  }
+
   box-shadow: $whole;
 }
 
 #alpha {
-  @include clones(1em, 1em, 32);
+
+  @include clones(2em, 2em, 32);
 }
