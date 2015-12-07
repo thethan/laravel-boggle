@@ -16,6 +16,9 @@ class BoggleBoard
     protected $squares = array();
     protected $checked = array();
     protected $inUse, $word, $allUses, $wordPool, $wordArray;
+    protected $letters;
+
+    protected $validate;
 
     /**
      * Generate a board
@@ -24,7 +27,7 @@ class BoggleBoard
      */
     public function __construct($size = 16)
     {
-        ini_set('max_execution_time', 300); //300 seconds = 5 minutes
+        ini_set('max_execution_time', 600); //300 seconds = 5 minutes
 
         $squares = [];
 
@@ -33,6 +36,8 @@ class BoggleBoard
         }
 
         $this->squares = $squares;
+
+        $this->validate = [];
 
 
     }
@@ -53,6 +58,7 @@ class BoggleBoard
      */
     public function solve()
     {
+        $this->lettersArray();
         $this->allUses = [];
         $this->wordPool = [];
 
@@ -61,54 +67,39 @@ class BoggleBoard
 
         foreach ($this->squares as $square) {
 
+
             $this->clearInUse(1);
             $this->inUse[1] = $square->id;
+            $this->allUses[$square->id] = [];
             $this->word[1] = $square->letter;
             $this->addToInUse($square->id, 1);
 
-            // add the second
-            foreach ($square->adjacent as $adj) {
-                $this->clearInUse(2);
-                $key = $this->lastUsedKey() + 1;
-                $value = $this->lastUsedValue();
-                $this->addToInUse($adj, $key);
 
-            }
-            $i = 0;
+            $i = 1;
             //get the icons after for the first and second key
-            while ($i < 14) {
-                if ($i === 7) {
-                    print "$i \n\n\n";
-                }
-                $allUses = $this->allUses[$square->id];
-                foreach ($allUses as $use) {
+            while ($i < 8) {
 
-                    $this->inUse = $use;
-                    $value = $this->lastUsedValue($use);
-                    $key = $this->lastUsedKey($use) + 1;
 
-                    $sq = $this->getSquare($value);
-                    $sq_adjacents = $this->adjacentSquare($sq->adjacent, $key);
-
-                    $sq_adjacents2 = $this->adjacentSquare($sq_adjacents, $key++);
-
-                    $sq_adjacents3 = $this->adjacentSquare($sq_adjacents2, $key++);
-
-                    $sq_adjacents4 = $this->adjacentSquare($sq_adjacents3, $key++);
-
-                    $sq_adjacents5 = $this->adjacentSquare($sq_adjacents4, $key++);
-
-                    var_dump($this->inUse);
-
-                    $sq_adjacents6 = $this->adjacentSquare($sq_adjacents5, $key++);
-                }
-
+                $this->getLastAndAdd($square->id);
 
                 $i++;
-            }
 
+            }
         }
-//        var_dump($this->allUses);
+    }
+
+    public function getLastAndAdd($id)
+    {
+        $allUses = $this->allUses[$id];
+        foreach ($allUses as $use) {
+            $this->inUse = $use;
+            $value = $this->lastUsedValue($use);
+            $key = $this->lastUsedKey($use);
+
+            $square = $this->getSquare($value);
+
+            $this->loopThroughAdjacent($square->adjacent, $key + 1);
+        }
     }
 
     public function clearInUse($placement = 1)
@@ -120,33 +111,47 @@ class BoggleBoard
 
     public function addToInUse($id, $place)
     {
+        $this->clearInUse($place);
+
         if (!in_array($id, $this->inUse)) {
 
-            $this->clearInUse($place);
+            $this->inUse[$place] = $id;
 
-            $square = $this->getSquare($id);
-            $this->inUse[$place] = $square->id;
+            reset($this->inUse);
+            $first_key = key($this->inUse);
 
-
-            $this->allUses[array_values($this->inUse)[0]][] = $this->inUse;
-
-            $used = array_values($this->inUse);
-            $result = array_diff($square->adjacent, $this->inUse);
-            if ($place > 2) {
-                foreach ($this->inUse as $key => $id) {
-                    $this->word[$key] = $this->getLetter($id);
-                }
-                $word = implode('', $this->word);
-                $this->checkWord($word);
-
+            if(!in_array($this->inUse, $this->allUses[$first_key])){
+                $this->allUses[$first_key][] = $this->inUse;
             }
+        }
 
 
-            return $result;
+        if ($place > 2) {
+            foreach ($this->inUse as $key => $id) {
+                $this->word[$key] = $this->letters[$id];
+            }
+            $word = implode('', $this->word);
+            $this->checkWord($word);
 
+        }
+//        $used = array_values($this->inUse);
+//        $result = array_diff($square->adjacent, $this->inUse);
+//
+//        return $result;
+
+
+    }
+
+    public function lettersArray()
+    {
+        $this->letters = [];
+        foreach ($this->squares as $square) {
+            $this->letters[$square->id] = $square->letter;
         }
 
     }
+
+
 
     /**
      * Pass in the Id and it will return the square based on the index.
@@ -178,8 +183,8 @@ class BoggleBoard
             if (!empty(Word::checkWord($word))) {
                 $this->words[] = $word;
             }
+            $this->checked[] = $word;
         }
-        $this->checked[] = $word;
     }
 
     public function lastUsedKey($inUse = null)
@@ -197,26 +202,26 @@ class BoggleBoard
         if (empty($inUse)) {
             $inUse = $this->inUse;
         }
-        return end($inUse);;
+        return end($inUse);
     }
 
     public function adjacentSquare($adjacents, $position)
     {
 
-        if (is_array($adjacents)) {
-            foreach ($adjacents as $id) {
+        foreach ($adjacents as $id) {
 
-                $square = $this->getSquare($id);
+            $square = $this->getSquare($id);
+            $this->addToInUse($id, $position);
 
-                return $this->loopThroughAdjacent($square->adjacent, $position);
-            }
+            return $this->loopThroughAdjacent($square->adjacent, $position + 1);
+
         }
     }
 
     public function loopThroughAdjacent($adjacentArray, $place)
     {
         foreach ($adjacentArray as $id) {
-            return $this->addToInUse($id, $place);
+            $this->addToInUse($id, $place);
         }
     }
 

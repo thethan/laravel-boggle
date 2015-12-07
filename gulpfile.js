@@ -15,5 +15,7 @@ elixir(function(mix) {
     mix.sass([
         '../../../bower_components/bootstrap/scss/bootstrap-flex.scss',
         'app.scss'
-    ]);
+    ]).browserSync({
+        proxy: 'boggle.app'
+    });;
 });
