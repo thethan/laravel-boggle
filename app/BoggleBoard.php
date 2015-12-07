@@ -57,7 +57,7 @@ class BoggleBoard
      */
     public function __construct($size = 16)
     {
-        ini_set('max_execution_time', 600); //300 seconds = 5 minutes
+        ini_set('max_execution_time', 1200); //300 seconds = 5 minutes
         ini_set('memory_limit', '256M');
 
         $squares = [];
@@ -112,8 +112,6 @@ class BoggleBoard
             }
 
         }
-//        var_dump($this->allUses, $this->words);
-        exit;
 
     }
 
@@ -132,7 +130,6 @@ class BoggleBoard
             $this->loopThroughAdjacent($square->adjacent, 2);
 
             $allUses = $this->allUses[$id];
-//            var_dump($allUses);
         }
 
         foreach ($allUses as $use) {
