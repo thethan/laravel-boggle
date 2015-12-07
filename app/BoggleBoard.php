@@ -58,7 +58,7 @@ class BoggleBoard
     public function __construct($size = 16)
     {
         ini_set('max_execution_time', 600); //300 seconds = 5 minutes
-        ini_set('memory_limit','256M');
+        ini_set('memory_limit', '256M');
 
         $squares = [];
 
@@ -90,7 +90,6 @@ class BoggleBoard
     public function solve()
     {
         $this->lettersArray();
-        $this->allUses = [];
         $this->wordPool = [];
 
         $this->word = [];
@@ -101,26 +100,41 @@ class BoggleBoard
             $this->clearInUse(1);
             $this->inUse[1] = $square->id;
             $this->allUses[$square->id] = [];
+            $this->allUses[$square->id][] = $this->inUse;
             $this->word[1] = $square->letter;
             $this->addToInUse($square->id, 1);
-
 
             $i = 1;
             //get the icons after for the first and second key
             while ($i < 6) {
-
                 $this->getLastAndAdd($square->id);
-
                 $i++;
-
             }
+
         }
+//        var_dump($this->allUses, $this->words);
         exit;
+
     }
 
+    /**
+     * Get the array of all in use and add it
+     * @param $id
+     */
     public function getLastAndAdd($id)
     {
         $allUses = $this->allUses[$id];
+
+        if (empty($allUses)) {
+            $this->addToInUse($id, 1);
+            $square = $this->getSquare($id);
+
+            $this->loopThroughAdjacent($square->adjacent, 2);
+
+            $allUses = $this->allUses[$id];
+//            var_dump($allUses);
+        }
+
         foreach ($allUses as $use) {
             $this->inUse = $use;
             $value = $this->lastUsedValue($use);
@@ -132,6 +146,9 @@ class BoggleBoard
         }
     }
 
+    /**
+     * @param int $placement
+     */
     public function clearInUse($placement = 1)
     {
         for ($i = $placement; $i <= $this->size; $i++) {
@@ -139,21 +156,29 @@ class BoggleBoard
         }
     }
 
+    /**
+     * Add to in Use
+     *
+     * @param $id
+     * @param $place
+     */
     public function addToInUse($id, $place)
     {
         $this->clearInUse($place);
 
-        if (!in_array($id, $this->inUse)) {
 
+        if(!in_array($id, $this->inUse)) {
             $this->inUse[$place] = $id;
-
-            reset($this->inUse);
-            $first_key = key($this->inUse);
-
-            if(!in_array($this->inUse, $this->allUses[$first_key])){
-                $this->allUses[$first_key][] = $this->inUse;
-            }
         }
+
+        $first_key = $this->inUse[1];
+
+
+        if(!in_array($this->inUse, $this->allUses[$first_key])) {
+
+            $this->allUses[$first_key][] = $this->inUse;
+        }
+
 
 
         if ($place > 2) {
@@ -165,9 +190,11 @@ class BoggleBoard
 
         }
 
-
     }
 
+    /**
+     * @todo I do not think this is needed
+     */
     public function lettersArray()
     {
         $this->letters = [];
@@ -176,7 +203,6 @@ class BoggleBoard
         }
 
     }
-
 
 
     /**
@@ -262,6 +288,10 @@ class BoggleBoard
         }
     }
 
+    /**
+     * @param $adjacentArray
+     * @param $place
+     */
     public function loopThroughAdjacent($adjacentArray, $place)
     {
         foreach ($adjacentArray as $id) {

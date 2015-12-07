@@ -45,7 +45,7 @@ class BoggleController extends Controller
      */
     public function index()
     {
-
+        $this->boggleBoard->solve();
         return view('welcome');
     }
 
@@ -56,7 +56,8 @@ class BoggleController extends Controller
      */
     public function solver()
     {
-        $this->boggleBoard->solve();
+        return $this->boggleBoard->solve();
+
         return view('solver', compact('boggleBoard'));
     }
 
