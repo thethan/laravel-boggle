@@ -4,7 +4,6 @@
 namespace App;
 
 
-use App\Dictionary\TextDictionary;
 
 class BoggleBoard
 {
@@ -49,6 +48,8 @@ class BoggleBoard
      * @var array
      */
     protected $dictionary;
+
+    public $maxWordLength = 5;
 
     /**
      * Generate a board
@@ -106,7 +107,7 @@ class BoggleBoard
 
             $i = 1;
             //get the icons after for the first and second key
-            while ($i < 6) {
+            while ($i < $this->maxWordLength) {
                 $this->getLastAndAdd($square->id);
                 $i++;
             }
@@ -180,7 +181,7 @@ class BoggleBoard
 
         if ($place > 2) {
             foreach ($this->inUse as $key => $id) {
-                $this->word[$key] = $this->letters[$id];
+                $this->word[] = $this->letters[$id];
             }
             $word = implode('', $this->word);
             $this->checkWord($word);
@@ -231,11 +232,12 @@ class BoggleBoard
      *
      * Using Wikipedia because it had a quasi api
      */
-    protected function checkWord($word)
+    public function checkWord($word)
     {
 
         if (strlen($word) >= 3 && !in_array($word, $this->checked)) {
             if (!empty($this->dictionary->checkWord($word))) {
+                
                 $this->words[] = $word;
             }
             $this->checked[] = $word;
